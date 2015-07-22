@@ -31,53 +31,18 @@
 #include "source/tessellation/shape_2d.hpp"
 #include "source/newtonian/test_2d/piecewise.hpp"
 #include "source/newtonian/two_dimensional/simple_flux_calculator.hpp"
-#include "source/newtonian/two_dimensional/simple_cell_updater.hpp"
 #include "source/newtonian/two_dimensional/simple_extensive_updater.hpp"
 #include "source/newtonian/test_2d/consecutive_snapshots.hpp"
 #include "source/newtonian/test_2d/multiple_diagnostics.hpp"
 #include "source/newtonian/two_dimensional/source_terms/cylindrical_complementary.hpp"
 #include "source/misc/vector_initialiser.hpp"
 #include "calc_init_cond.hpp"
+#include "custom_cell_updater.hpp"
 
 using namespace std;
 using namespace simulation2d;
 
 namespace {
-
-  class CustomCellUpdater: public CellUpdater
-  {
-  public:
-
-    CustomCellUpdater(void) {}
-
-    vector<ComputationalCell> operator()
-    (const Tessellation& /*tess*/,
-     const PhysicalGeometry& /*pg*/,
-     const EquationOfState& eos,
-     const vector<Extensive>& extensives,
-     const vector<ComputationalCell>& old,
-     const CacheData& cd) const
-    {
-      vector<ComputationalCell> res = old;
-      for(size_t i=0;i<extensives.size();++i){
-	if(old[i].stickers.find("obstacle")->second)
-	  continue;
-	const double volume = cd.volumes[i];
-	res[i].density = extensives[i].mass/volume;
-	res[i].velocity = extensives[i].momentum / extensives[i].mass;
-	const double total_energy = extensives[i].energy/extensives[i].mass;
-	const double kinetic_energy =
-	  0.5*ScalarProd(res[i].velocity, res[i].velocity);
-	const double energy = total_energy - kinetic_energy;
-	res[i].pressure = eos.de2p(res[i].density, energy);
-	for(std::map<std::string,double>::const_iterator it =
-	      extensives[i].tracers.begin();
-	    it!=extensives[i].tracers.end();++it)
-	  res[i].tracers[it->first] = it->second/extensives[i].mass;
-      }
-      return res;
-    }
-  };
 
   double calc_tracer_flux(const Edge& edge,
 			  const Tessellation& tess,
