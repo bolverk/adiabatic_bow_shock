@@ -36,6 +36,7 @@
 #include "source/newtonian/test_2d/consecutive_snapshots.hpp"
 #include "source/newtonian/test_2d/multiple_diagnostics.hpp"
 #include "source/newtonian/two_dimensional/source_terms/cylindrical_complementary.hpp"
+#include "source/misc/vector_initialiser.hpp"
 
 using namespace std;
 using namespace simulation2d;
@@ -141,6 +142,7 @@ namespace {
     (const Tessellation& tess,
      const vector<Vector2D>& point_velocities,
      const vector<ComputationalCell>& cells,
+     const vector<Extensive>& /*extensive*/,
      const EquationOfState& eos,
      const double /*time*/,
      const double /*dt*/) const
@@ -319,12 +321,12 @@ namespace {
   {
     const double tf = 10;
     SafeTimeTermination term_cond(tf,1e6);
-    WriteTime diag1("time.txt");
-    ConsecutiveSnapshots diag2(new ConstantTimeInterval(tf/1000),
-			       new Rubric("snapshot_",".h5"));
-    MultipleDiagnostics diag;
-    diag.diag_list.push_back(&diag1);
-    diag.diag_list.push_back(&diag2);
+    MultipleDiagnostics diag
+      (VectorInitialiser<DiagnosticFunction*>
+       (new WriteTime("time.txt"))
+       (new ConsecutiveSnapshots
+	(new ConstantTimeInterval(tf/1000),
+	 new Rubric("snapshot_",".h5")))());
     main_loop(sim,
 	      term_cond,
 	      &hdsim::TimeAdvance,
