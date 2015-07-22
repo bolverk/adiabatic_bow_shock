@@ -43,22 +43,6 @@ using namespace simulation2d;
 
 namespace {
 
-#ifdef RICH_MPI
-  vector<Vector2D> process_positions(const SquareBox& boundary)
-  {
-    const Vector2D lower_left = boundary.getBoundary().first;
-    const Vector2D upper_right = boundary.getBoundary().second;
-    vector<Vector2D> res(get_mpi_size());
-    if(get_mpi_rank()==0){
-      res = RandSquare(get_mpi_size(),
-		       lower_left.x,upper_right.x,
-		       lower_left.y,upper_right.y);
-    }
-    MPI_VectorBcast_Vector2D(res,0,MPI_COMM_WORLD,get_mpi_rank());
-    return res;
-  }
-#endif
-
   vector<ComputationalCell> calc_init_cond(const Tessellation& tess)
   {
     vector<ComputationalCell> res(static_cast<size_t>(tess.GetPointNo()));
