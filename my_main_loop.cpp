@@ -3,6 +3,8 @@
 #include "source/newtonian/test_2d/multiple_diagnostics.hpp"
 #include "source/misc/vector_initialiser.hpp"
 #include "source/newtonian/test_2d/consecutive_snapshots.hpp"
+#include "volume_appendix.hpp"
+#include "temperature_appendix.hpp"
 
 using namespace simulation2d;
 
@@ -15,7 +17,11 @@ void my_main_loop(hdsim& sim)
      (new WriteTime("time.txt"))
      (new ConsecutiveSnapshots
       (new ConstantTimeInterval(tf/1000),
-       new Rubric("snapshot_",".h5")))());
+       new Rubric("snapshot_",".h5"),
+       VectorInitialiser<DiagnosticAppendix*>
+       (new TemperatureAppendix(1,1))
+       (new VolumeAppendix())()
+       ))());
   main_loop(sim,
 	    term_cond,
 	    &hdsim::TimeAdvance,
