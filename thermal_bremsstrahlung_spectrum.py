@@ -81,7 +81,60 @@ def snr_knot():
     pylab.ylabel(r'$F_{\nu}$ [erg/s/Hz]')
     pylab.show()
 
+def real_deal():
+
+    import glob
+    import h5py
+    import numpy
+    import pylab
+
+    def extract_number(snapshot_file):
+
+        import re
+
+        res = re.match(r'snapshot_([0-9]*).h5',snapshot_file)
+
+        return int(res.group(1))
+
+    snapshot_list = sorted(glob.glob('snapshot_*.h5'),
+                           key=extract_number)
+
+    last_snapshot_file = snapshot_list[-1]
+
+    with h5py.File(last_snapshot_file) as f:
+        raw = {}
+        for field in ['temperature','volumes']:
+            raw[field] = numpy.array(f[field])
+
+    constants = {'speed of light':3e10,
+                 'planck constant':6.626e-27,
+                 'boltzmann constant':1.38e-16,
+                 'solar radius':6.96e10,
+                 'bremsstrahlung prefactor':6.8e-38,
+                 'kelvin':1,
+                 'electron volt':1.6e-12,
+                 'wind velocity':1000*1000*1e2,
+                 'adiabatic index':5./3.,
+                 'proton mass':1.67e-24}
+    max_temperatue = (
+        0.5*constants['proton mass']*(1000*1e3*1e2)**2/
+        constants['boltzmann constant'])
+    scaled = {}
+    scaled['volumes'] = raw['volumes']*constants['solar radius']**3
+    scaled['temperature'] = raw['temperature']*max_temperatue/numpy.max(raw['temperature'])
+    frequency_list = numpy.logspace(1,20,num=100)
+    spectrum = spectrum_integrate(scaled['volumes'],
+                                  scaled['temperature'],
+                                  frequency_list,
+                                  constants)
+    pylab.loglog(frequency_list*constants['planck constant']/constants['electron volt'],
+                 spectrum)
+    pylab.xlabel('Photon Energy [eV]')
+    pylab.ylabel(r'$F_{\nu}$ [erg/s/Hz]')
+    pylab.show()
+
 if __name__ == '__main__':
 
-    snr_knot()
+    #snr_knot()
+    real_deal()
         
