@@ -81,6 +81,19 @@ def snr_knot():
     pylab.ylabel(r'$F_{\nu}$ [erg/s/Hz]')
     pylab.show()
 
+def calc_max_temperature(g=None,m=None,v=None,k=None):
+        
+    return 2*(g-1)*m*v**2/k/(g+1)**2
+
+def calc_high_end_spectrum(R = None, v = None, g = None, f = None, h = None,
+                           k = None, me = None, c = None, mp=None, n=None,
+                           q = None):
+    import math
+    T0 = calc_max_temperature(g=g, m=mp, v=v, k=k)
+    return (64.*math.sqrt(2.)*math.exp(-f*(g+1)**2*h/(2*(g-1)*mp*v**2))*
+            f*(g-1)**2*mp**2*n**2*math.pi**2*q**6*R**3*v**4/
+            (3*c**3*(g+1)**4*(f*h)**(9./2.)*me**(3./2.)))*h
+
 def real_deal():
 
     import glob
@@ -115,20 +128,36 @@ def real_deal():
                  'electron volt':1.6e-12,
                  'wind velocity':1000*1000*1e2,
                  'adiabatic index':5./3.,
-                 'proton mass':1.67e-24}
-    max_temperatue = (
-        0.5*constants['proton mass']*(1000*1e3*1e2)**2/
-        constants['boltzmann constant'])
+                 'proton mass':1.67e-24,
+                 'electron mass':9.1e-28}
+    max_temperatue = calc_max_temperature(g = constants['adiabatic index'],
+                                          m = constants['proton mass'],
+                                          v = constants['wind velocity'],
+                                          k = constants['boltzmann constant'])
     scaled = {}
     scaled['volumes'] = raw['volumes']*constants['solar radius']**3
     scaled['temperature'] = raw['temperature']*max_temperatue/numpy.max(raw['temperature'])
     frequency_list = numpy.logspace(1,20,num=100)
+    high_end_spectrum = map(lambda x: calc_high_end_spectrum(R=0.01*constants['solar radius'],
+                                                             v = constants['wind velocity'],
+                                                             g = constants['adiabatic index'],
+                                                             f = x,
+                                                             h = constants['planck constant'],
+                                                             k = constants['boltzmann constant'],
+                                                             mp = constants['proton mass'],
+                                                             me = constants['electron mass'],
+                                                             c = constants['speed of light'],
+                                                             n = 1,
+                                                             q = 4.8e-10),
+                            frequency_list)
     spectrum = spectrum_integrate(scaled['volumes'],
                                   scaled['temperature'],
                                   frequency_list,
                                   constants)
     pylab.loglog(frequency_list*constants['planck constant']/constants['electron volt'],
-                 spectrum)
+                 spectrum,
+                 frequency_list*constants['planck constant']/constants['electron volt'],
+                 high_end_spectrum)
     pylab.xlabel('Photon Energy [eV]')
     pylab.ylabel(r'$F_{\nu}$ [erg/s/Hz]')
     pylab.show()
