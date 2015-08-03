@@ -94,6 +94,36 @@ def calc_high_end_spectrum(R = None, v = None, g = None, f = None, h = None,
             f*(g-1)**2*mp**2*n**2*math.pi**2*q**6*R**3*v**4/
             (3*c**3*(g+1)**4*(f*h)**(9./2.)*me**(3./2.)))*h
 
+def calc_mid_range_spectrum(n = None, q = None, R = None, z = None, v = None, g = None,
+                          f = None, h = None, k = None, mp = None, me = None, c = None):
+
+    import math
+
+    for itm in [n,q,R,z,v,g,f,h,k,mp,me,c]:
+        assert(itm is not None)
+
+    rc = q**2/(me*c**2)
+
+    return (32*math.sqrt(2*math.pi)*c**3*
+            me**(3./2.)*mp**2*n**2*R**3*
+            rc**3*v**4*(g-1)**2/
+            (15*(h*f)**(5./2.)*(g+1)))
+
+def calc_low_end_spectrum(n = None, q = None, R = None, z = None, v = None, g = None,
+                          f = None, h = None, k = None, mp = None, me = None, c = None):
+
+    import math
+
+    for itm in [n,q,R,z,v,g,f,h,k,mp,me,c]:
+        assert(itm is not None)
+
+    r = math.sqrt(2*z*R)
+    Tmin = 2*(g-1)*mp*v**2/(k*(1+(r/R)**2)*(g+1))
+
+    return -(32.*math.sqrt(2.)*mp*n**2*math.pi**(3./2.)*
+            q**6*R**3*v**2*(g-1)*math.log(h*f/(4.*k*Tmin))/
+            (3*c**3*h*(k*me*Tmin)**(3./2.)*(g+1)**2))*h
+
 def real_deal():
 
     import glob
@@ -137,7 +167,33 @@ def real_deal():
     scaled = {}
     scaled['volumes'] = raw['volumes']*constants['solar radius']**3
     scaled['temperature'] = raw['temperature']*max_temperatue/numpy.max(raw['temperature'])
-    frequency_list = numpy.logspace(1,20,num=100)
+    frequency_list = numpy.logspace(11,20,num=100)
+    low_end_spectrum = map(lambda x: calc_low_end_spectrum(R=0.01*constants['solar radius'],
+                                                             v = constants['wind velocity'],
+                                                             g = constants['adiabatic index'],
+                                                             f = x,
+                                                             h = constants['planck constant'],
+                                                             k = constants['boltzmann constant'],
+                                                             mp = constants['proton mass'],
+                                                             me = constants['electron mass'],
+                                                             c = constants['speed of light'],
+                                                             n = 1,
+                                                             q = 4.8e-10,
+                                                             z=constants['solar radius']),
+                           frequency_list)
+    mid_range_spectrum = map(lambda x: calc_mid_range_spectrum(R=0.01*constants['solar radius'],
+                                                               v = constants['wind velocity'],
+                                                               g = constants['adiabatic index'],
+                                                               f = x,
+                                                               h = constants['planck constant'],
+                                                               k = constants['boltzmann constant'],
+                                                               mp = constants['proton mass'],
+                                                               me = constants['electron mass'],
+                                                               c = constants['speed of light'],
+                                                               n = 1,
+                                                               q = 4.8e-10,
+                                                               z=constants['solar radius']),
+                             frequency_list)
     high_end_spectrum = map(lambda x: calc_high_end_spectrum(R=0.01*constants['solar radius'],
                                                              v = constants['wind velocity'],
                                                              g = constants['adiabatic index'],
@@ -157,9 +213,14 @@ def real_deal():
     pylab.loglog(frequency_list*constants['planck constant']/constants['electron volt'],
                  spectrum,
                  frequency_list*constants['planck constant']/constants['electron volt'],
+                 low_end_spectrum,
+                 frequency_list*constants['planck constant']/constants['electron volt'],
+                 mid_range_spectrum,
+                 frequency_list*constants['planck constant']/constants['electron volt'],
                  high_end_spectrum)
     pylab.xlabel('Photon Energy [eV]')
     pylab.ylabel(r'$F_{\nu}$ [erg/s/Hz]')
+    pylab.legend(['numeric','low end','mid range','high end'],loc='best')
     pylab.show()
 
 if __name__ == '__main__':
