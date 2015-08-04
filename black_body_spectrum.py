@@ -105,13 +105,33 @@ def calc_max_temperature(g=None,m=None,v=None,k=None):
 
 def calc_high_end_spectrum(f=None, R=None, v=None,
                            g=None, h=None, k=None,
-                           T0=None, c=None):
+                           T0=None, c=None,mp=None):
 
     import math
 
-    return (4*math.sqrt(2.)*math.pi*R**2*v**3*(g-1)**1.5*f**1.5*
+    return (4*math.sqrt(2.)*mp**1.5*math.pi*R**2*v**3*
+            (g-1)**1.5*f**1.5*
             math.sqrt(h*f/k/T0)*math.exp(-h*f/k/T0)/
-            (c**2*math.sqrt(h)*(g+1)**3))*h
+            (c**2*math.sqrt(h)*(g+1)**3))
+
+def calc_low_end_spectrum(f=None, R=None, v=None,
+                          g=None, h=None, k=None,
+                          T1=None, c=None, mp=None):
+
+    import math
+
+    return (4*math.sqrt(2.)*R**2*math.pi*mp**1.5*v**3*(g-1)**1.5*f**2/
+            (c**2*math.sqrt(k*T1)*(g+1)**3))/1.5
+
+def calc_mid_range_spectrum(f=None, R=None, v=None,
+                            g=None, h=None, k=None,
+                            T1=None, c=None, mp=None):
+
+    import math
+
+    return (4*math.sqrt(2.)*math.pi*mp**1.5*
+            R**2*v**3*(g-1)**1.5*f**1.5*2.32/
+            (c**2*math.sqrt(h)*(g+1)**3))/1.5
 
 def real_deal():
 
@@ -137,6 +157,7 @@ def real_deal():
                                               m = constants['proton mass'],
                                               v = constants['wind velocity'],
                                               k = constants['boltzmann constant'])
+    min_temperature = max_temperatue/(1.+2*1./0.01)
     scaled = {}
     scaled['areas'] = numpy.array(a_front)*constants['solar radius']**2
     scaled['temperature'] = numpy.array(t_front)*max_temperatue/numpy.max(t_front)
@@ -152,15 +173,46 @@ def real_deal():
                                                 h=constants['planck constant'],
                                                 k=constants['boltzmann constant'],
                                                 T0=max_temperatue,
-                                                c=constants['speed of light'])
+                                                c=constants['speed of light'],
+                                                mp=constants['proton mass'])
                          for f in frequency_list]
-    print high_end_spectrum
+    low_end_spectrum = [calc_low_end_spectrum(f=f,
+                                              R=1e-2*constants['solar radius'],
+                                              v=constants['wind velocity'],
+                                              g=constants['adiabatic index'],
+                                              h=constants['planck constant'],
+                                              k=constants['boltzmann constant'],
+                                              T1=min_temperature,
+                                              c=constants['speed of light'],
+                                              mp=constants['proton mass'])
+                        for f in frequency_list]
+    mid_range_spectrum = [calc_mid_range_spectrum(f=f,
+                                                  R=1e-2*constants['solar radius'],
+                                                  v=constants['wind velocity'],
+                                                  g=constants['adiabatic index'],
+                                                  h=constants['planck constant'],
+                                                  k=constants['boltzmann constant'],
+                                                  T1=min_temperature,
+                                                  c=constants['speed of light'],
+                                                  mp=constants['proton mass'])
+                          for f in frequency_list]
     pylab.loglog(frequency_list*constants['planck constant']/constants['electron volt'],
-                 spectrum)
+                 spectrum,
+                 label='numeric')
     pylab.loglog(frequency_list*constants['planck constant']/constants['electron volt'],
-                 high_end_spectrum)
+                 high_end_spectrum,
+                 label='high end')
+    pylab.loglog(frequency_list*constants['planck constant']/constants['electron volt'],
+                 low_end_spectrum,
+                 label='low end')
+    pylab.loglog(frequency_list*constants['planck constant']/constants['electron volt'],
+                 mid_range_spectrum,
+                 label='mid range')
+    pylab.xlabel('Photon Energy [eV]')
+    pylab.ylabel(r'$F_{\nu}$ [erg/s/Hz]')
+    pylab.legend(loc='best')
     pylab.show()
-        
+    
 if __name__ == '__main__':
 
     #snr_knot()
