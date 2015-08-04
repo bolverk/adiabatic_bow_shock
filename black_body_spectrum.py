@@ -103,6 +103,16 @@ def calc_max_temperature(g=None,m=None,v=None,k=None):
         
     return 2*(g-1)*m*v**2/k/(g+1)**2
 
+def calc_high_end_spectrum(f=None, R=None, v=None,
+                           g=None, h=None, k=None,
+                           T0=None, c=None):
+
+    import math
+
+    return (4*math.sqrt(2.)*math.pi*R**2*v**3*(g-1)**1.5*f**1.5*
+            math.sqrt(h*f/k/T0)*math.exp(-h*f/k/T0)/
+            (c**2*math.sqrt(h)*(g+1)**3))*h
+
 def real_deal():
 
     import pickle
@@ -135,8 +145,20 @@ def real_deal():
                                   scaled['temperature'],
                                   frequency_list,
                                   constants)
+    high_end_spectrum = [calc_high_end_spectrum(f=f,
+                                                R=1e-2*constants['solar radius'],
+                                                v=constants['wind velocity'],
+                                                g=constants['adiabatic index'],
+                                                h=constants['planck constant'],
+                                                k=constants['boltzmann constant'],
+                                                T0=max_temperatue,
+                                                c=constants['speed of light'])
+                         for f in frequency_list]
+    print high_end_spectrum
     pylab.loglog(frequency_list*constants['planck constant']/constants['electron volt'],
                  spectrum)
+    pylab.loglog(frequency_list*constants['planck constant']/constants['electron volt'],
+                 high_end_spectrum)
     pylab.show()
         
 if __name__ == '__main__':
