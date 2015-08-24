@@ -5,6 +5,7 @@
 #include "source/newtonian/test_2d/consecutive_snapshots.hpp"
 #include "volume_appendix.hpp"
 #include "temperature_appendix.hpp"
+#include "write_wall_time.hpp"
 
 using namespace simulation2d;
 
@@ -15,6 +16,7 @@ void my_main_loop(hdsim& sim)
   MultipleDiagnostics diag
     (VectorInitialiser<DiagnosticFunction*>
      (new WriteTime("time.txt"))
+     (new WriteWallTime("wall_time.txt"))
      (new ConsecutiveSnapshots
       (new ConstantTimeInterval(tf/1000),
        new Rubric("snapshot_",".h5"),
