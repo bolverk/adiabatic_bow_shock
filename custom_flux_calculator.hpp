@@ -14,6 +14,7 @@ public:
    const vector<Vector2D>& point_velocities,
    const vector<ComputationalCell>& cells,
    const vector<Extensive>& /*extensive*/,
+   const CacheData& cd,
    const EquationOfState& eos,
    const double /*time*/,
    const double /*dt*/) const;
