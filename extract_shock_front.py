@@ -25,7 +25,6 @@ def main():
 
     import h5py
     import numpy
-    import pickle
 
     args = get_input_from_user()
     if args.show:
@@ -43,7 +42,7 @@ def main():
                                      y_list[obstacle_list<0.5],
                                      s_list[obstacle_list<0.5],
                                      threshold)
-    pickle.dump(contour_points, open(args.out_file,'wb'))
+    numpy.savetxt(args.out_file,contour_points)
     if args.show:
         pylab.plot(contour_points.T[0],
                    contour_points.T[1],'.')
