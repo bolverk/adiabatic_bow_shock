@@ -2,9 +2,9 @@
 
 SimData::SimData(void):
   pg_(Vector2D(0,0), Vector2D(0,1)),
-  outer_(Vector2D(0,-0.2),
-	 Vector2D(0.25,1.8)),
-  init_points_(cartesian_mesh(50*2,400*2,
+  outer_(Vector2D(0,-0.05),
+	 Vector2D(0.1,0.05)),
+  init_points_(cartesian_mesh(4*100,4*100,
 			      outer_.getBoundary().first,
 			      outer_.getBoundary().second)),
   tess_(init_points_, outer_),
