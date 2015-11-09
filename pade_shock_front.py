@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('Qt4Agg')
+
 def get_user_input():
 
     from argparse import ArgumentParser
@@ -62,8 +65,27 @@ def main():
         pade_approximant = PadeApproximant(out.values)
         y_reconstructed = numpy.array([pade_approximant(x)
                                        for x in data.T[0]])
-        pylab.plot(data.T[0], data.T[1], '.')
-        pylab.plot(data.T[0], y_reconstructed)
+        #pylab.subplot(211)
+        pylab.plot(data.T[0], data.T[1], linewidth=3, label='numeric')
+        pylab.plot(data.T[0], y_reconstructed, linewidth=3,
+                   label='pade')
+        pylab.xlim((numpy.min(data.T[0]),
+                    numpy.max(data.T[0])))
+        pylab.legend(loc='best')
+        #pylab.gca().xaxis.set_major_formatter(pylab.NullFormatter())
+        pylab.ylabel('y')
+        #pylab.subplot(212)
+        #difference = y_reconstructed - data.T[1]
+        #pylab.scatter(data.T[0], difference)
+        #for x,y in zip(data.T[0], difference):
+        #    pylab.plot([x,x], [0,y], 'k')
+        #pylab.xlim((numpy.min(data.T[0]),
+        #            numpy.max(data.T[0])))
+        #pylab.ylim((numpy.min(difference),
+        #            numpy.max(difference)))
+        pylab.xlabel('x')
+        #pylab.ylabel('residue')
+        pylab.tight_layout()
         pylab.show()
 
 if __name__ == '__main__':
