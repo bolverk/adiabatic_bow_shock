@@ -27,11 +27,18 @@ if int(debug):
 else:
     f90flags = ' -O3 '
 
+build_dir = 'build/'+compiler+'/'
+if int(debug):
+    build_dir += 'debug'
+else:
+    build_dir += 'release'
 env = Environment(ENV = os.environ,
                   CXX=compiler,
                   CPPPATH=[os.environ['RICH_ROOT']+'/source',
                            os.environ['RICH_ROOT']],
-                  LIBPATH=[os.environ['RICH_ROOT'],'.',os.environ['HDF5_LIB_PATH']],
+                  LIBPATH=[os.environ['RICH_ROOT']+'/'+build_dir,
+                           '.',
+                           os.environ['HDF5_LIB_PATH']],
                   LIBS=['rich','hdf5','hdf5_cpp','gfortran'],
                   LINKFLAGS=linkflags,
                   F90FLAGS=f90flags,
