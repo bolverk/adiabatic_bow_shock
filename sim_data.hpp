@@ -14,6 +14,8 @@
 #include "source/misc/mesh_generator.hpp"
 #include "calc_init_cond.hpp"
 #include "source/newtonian/two_dimensional/stationary_box.hpp"
+#include "wind.hpp"
+#include "source/newtonian/two_dimensional/source_terms/SeveralSources.hpp"
 
 class SimData
 {
@@ -32,13 +34,15 @@ private:
   Eulerian point_motion_;
   const StationaryBox evc_;
   const Hllc rs_;
-  CylindricalComplementary force_;
+  CylindricalComplementary geom_source_;
+  Wind wind_source_;
+  SeveralSources source_;
   const SimpleCFL tsf_;
-  //    const SimpleFluxCalculator fc_;
-  const CustomFluxCalculator fc_;
+  const SimpleFluxCalculator fc_;
+  //  const CustomFluxCalculator fc_;
   const SimpleExtensiveUpdater eu_;
-  //    const SimpleCellUpdater cu_;
-  const CustomCellUpdater cu_;
+  const SimpleCellUpdater cu_;
+  //  const CustomCellUpdater cu_;
   hdsim sim_;
 };
 

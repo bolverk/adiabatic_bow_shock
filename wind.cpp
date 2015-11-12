@@ -2,11 +2,11 @@
 
 Wind::Wind(const double specific_mass_loss,
 	   const double speed,
-	   const double mass2thermal,
+	   const double t2k,
 	   const double radius):
   specific_mass_loss_(specific_mass_loss),
   speed_(speed),
-  mass2thermal_(mass2thermal),
+  t2k_(t2k),
   radius_(radius) {}
 
 vector<Extensive> Wind::operator()
@@ -28,8 +28,7 @@ vector<Extensive> Wind::operator()
       res[i].mass = specific_mass_loss_*cd.volumes[i];
       res[i].momentum = res[i].mass*speed_*r/abs(r);
       res[i].energy = 
-	0.5*ScalarProd(res[i].momentum,res[i].momentum)/res[i].mass+
-	res[i].mass*mass2thermal_;
+	0.5*ScalarProd(res[i].momentum,res[i].momentum)/res[i].mass*(1+t2k_);
     }
   }
   return res;

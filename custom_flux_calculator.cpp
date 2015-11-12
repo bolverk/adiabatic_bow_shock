@@ -1,5 +1,6 @@
 #include "custom_flux_calculator.hpp"
 #include "source/newtonian/common/hydrodynamics.hpp"
+#include "source/misc/utils.hpp"
 
 namespace {
     double calc_tracer_flux(const Edge& edge,
@@ -112,8 +113,8 @@ const Conserved CustomFluxCalculator::calcHydroFlux
     static_cast<size_t>(edge.neighbors.second);
   const ComputationalCell& left_cell = cells[left_index];
   const ComputationalCell& right_cell = cells[right_index];
-  if(left_cell.stickers.find("obstacle")->second &&
-     right_cell.stickers.find("obstacle")->second)
+  if(safe_retrieve(left_cell.stickers,string("obstacle")) &&
+     safe_retrieve(right_cell.stickers,string("obstacle")))
     return Conserved();
   const Vector2D p = Parallel(edge);
   const Vector2D n =

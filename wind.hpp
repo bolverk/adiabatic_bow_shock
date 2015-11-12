@@ -10,7 +10,7 @@ public:
   Wind
   (const double specific_mass_loss,
    const double speed,
-   const double mass2thermal,
+   const double t2k,
    const double radius);
   
   vector<Extensive> operator()
@@ -25,7 +25,7 @@ public:
 private:
   const double specific_mass_loss_;
   const double speed_;
-  const double mass2thermal_;
+  const double t2k_;
   const double radius_;
 };
 

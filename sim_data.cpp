@@ -1,4 +1,5 @@
 #include "sim_data.hpp"
+#include "source/misc/vector_initialiser.hpp"
 
 SimData::SimData(void):
   pg_(Vector2D(0,0), Vector2D(0,1)),
@@ -12,7 +13,17 @@ SimData::SimData(void):
   point_motion_(),
   evc_(),
   rs_(),
-  force_(pg_.getAxis()),
+  geom_source_(pg_.getAxis()),
+  wind_source_
+  (4*M_PI/10/(4.0*M_PI*pow(0.01,3)/3.),
+   10,
+   1e-3,
+   0.01),
+  source_
+  (VectorInitialiser<SourceTerm*>
+   (&geom_source_)
+   (&wind_source_)
+   ()),
   tsf_(0.3),
   fc_(rs_),
   eu_(),
@@ -24,7 +35,7 @@ SimData::SimData(void):
        eos_,
        point_motion_,
        evc_,
-       force_,
+       source_,
        tsf_,
        fc_,
        eu_,
