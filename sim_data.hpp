@@ -28,6 +28,7 @@ public:
 private:
   const CylindricalSymmetry pg_;
   const SquareBox outer_;
+  VoronoiMesh proctess_;
   const vector<Vector2D> init_points_;
   VoronoiMesh tess_;
   const IdealGas eos_;

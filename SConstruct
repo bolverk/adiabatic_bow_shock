@@ -12,6 +12,12 @@ if compiler=='g++':
         linkflags = ' -g -pg '
     else:
         cflags += ' -O3 '
+elif compiler=='mpiCC':
+    cflags = ' -DRICH_MPI -Wfatal-errors '
+    if int(debug):
+        cflags += ' -O0 -g -pg '
+    else:
+        cflags += ' -O3 -march=native'
 elif compiler=='clang++':
     cflags = '-Weverything -Werror -ferror-limit=1 -Wno-error=padded'
     if int(debug):
@@ -21,11 +27,6 @@ elif compiler=='clang++':
         cflags += ' -O3 -march=native'
 else:
     raise NameError('unsupported compiler')
-
-if int(debug):
-    f90flags = ' -g -Og '
-else:
-    f90flags = ' -O3 '
 
 build_dir = 'build/'+compiler+'/'
 if int(debug):
@@ -39,9 +40,8 @@ env = Environment(ENV = os.environ,
                   LIBPATH=[os.environ['RICH_ROOT']+'/'+build_dir,
                            '.',
                            os.environ['HDF5_LIB_PATH']],
-                  LIBS=['rich','hdf5','hdf5_cpp','gfortran'],
+                  LIBS=['rich','hdf5','hdf5_cpp','gfortran','boost_mpi','boost_serialization'],
                   LINKFLAGS=linkflags,
-                  F90FLAGS=f90flags,
                   CXXFLAGS=cflags)
                   
 env.Program('rich',

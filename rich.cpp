@@ -3,6 +3,8 @@
 #include <cmath>
 #include <vector>
 #include <string>
+#include <boost/mpi/environment.hpp>
+#include <boost/mpi/communicator.hpp>
 #include "source/tessellation/geometry.hpp"
 #include "source/tessellation/tessellation.hpp"
 #include "source/newtonian/two_dimensional/spatial_distributions/uniform2d.hpp"
@@ -23,6 +25,9 @@ using namespace std;
 
 int main(void)
 {
+  boost::mpi::environment env;
+  const boost::mpi::communicator world;
+
   SimData sim_data;
   hdsim& sim = sim_data.getSim();
 
