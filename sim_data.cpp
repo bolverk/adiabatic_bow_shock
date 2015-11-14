@@ -1,6 +1,7 @@
 #include "sim_data.hpp"
 #include "source/misc/vector_initialiser.hpp"
 #include <boost/mpi/collectives.hpp>
+#include "source/mpi/MeshPointsMPI.hpp"
 
 namespace {
   vector<Vector2D> process_positions
@@ -28,9 +29,18 @@ SimData::SimData(void):
   outer_(Vector2D(0,-0.2),
 	 Vector2D(0.25,1.8)),
   proctess_(process_positions(outer_),outer_),
+  /*
   init_points_(cartesian_mesh(50*2,400*2,
 			      outer_.getBoundary().first,
 			      outer_.getBoundary().second)),
+  */
+  init_points_
+  (SquareMeshM
+   (50*2,
+    400*2,
+    proctess_,
+    outer_.getBoundary().first,
+    outer_.getBoundary().second)),
   tess_(proctess_,init_points_, outer_),
   eos_(5./3.),
   point_motion_(),
