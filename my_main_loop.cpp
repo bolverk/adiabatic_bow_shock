@@ -19,7 +19,7 @@ void my_main_loop(hdsim& sim)
   MultipleDiagnostics diag
     (VectorInitialiser<DiagnosticFunction*>
      (new WriteTime("time_"+rank_s+".txt"))
-     (new WriteWallTime("wall_time"+rank_s+".txt"))
+     (new WriteWallTime("wall_time_"+rank_s+".txt"))
      (new ConsecutiveSnapshots
       (new ConstantTimeInterval(tf/1000),
        new Rubric("snapshot_"+rank_s+"_",".h5"),
