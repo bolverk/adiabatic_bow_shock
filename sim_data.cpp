@@ -2,6 +2,7 @@
 #include "source/misc/vector_initialiser.hpp"
 #include <boost/mpi/collectives.hpp>
 #include "source/mpi/MeshPointsMPI.hpp"
+#include "source/tessellation/RoundGrid.hpp"
 
 namespace {
   vector<Vector2D> process_positions
@@ -20,7 +21,7 @@ namespace {
 	 lower_left.y,
 	 upper_right.y);
     boost::mpi::broadcast(world, res, 0);
-    return res;
+    return RoundGrid(res,&boundary,20);
   }
 }
 
@@ -29,11 +30,6 @@ SimData::SimData(void):
   outer_(Vector2D(0,-0.5),
 	 Vector2D(0.5,0.5)),
   proctess_(process_positions(outer_),outer_),
-  /*
-  init_points_(cartesian_mesh(50*2,400*2,
-			      outer_.getBoundary().first,
-			      outer_.getBoundary().second)),
-  */
   init_points_
   (SquareMeshM
    (400,
@@ -48,7 +44,7 @@ SimData::SimData(void):
   rs_(),
   geom_source_(pg_.getAxis()),
   wind_source_
-  (0.1*4*M_PI/10/(4.0*M_PI*pow(0.01,3)/3.),
+  (1e-2*4*M_PI/10/(4.0*M_PI*pow(0.01,3)/3.),
    10,
    1e-3,
    0.01),
