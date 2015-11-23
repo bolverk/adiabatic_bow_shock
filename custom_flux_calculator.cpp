@@ -113,9 +113,6 @@ const Conserved CustomFluxCalculator::calcHydroFlux
     static_cast<size_t>(edge.neighbors.second);
   const ComputationalCell& left_cell = cells[left_index];
   const ComputationalCell& right_cell = cells[right_index];
-  if(safe_retrieve(left_cell.stickers,string("obstacle")) &&
-     safe_retrieve(right_cell.stickers,string("obstacle")))
-    return Conserved();
   const Vector2D p = Parallel(edge);
   const Vector2D n =
     tess.GetMeshPoint(edge.neighbors.second) -
