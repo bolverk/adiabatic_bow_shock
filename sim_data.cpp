@@ -3,9 +3,9 @@
 
 SimData::SimData(void):
   pg_(Vector2D(0,0), Vector2D(0,1)),
-  outer_(Vector2D(0,-0.2),
-	 Vector2D(0.25,1.8)),
-  init_points_(cartesian_mesh(50*2,400*2,
+  outer_(Vector2D(0,-0.5),
+	 Vector2D(1.0,0.5)),
+  init_points_(cartesian_mesh(100,100,
 			      outer_.getBoundary().first,
 			      outer_.getBoundary().second)),
   tess_(init_points_, outer_),
@@ -15,7 +15,7 @@ SimData::SimData(void):
   rs_(),
   geom_source_(pg_.getAxis()),
   wind_source_
-  (4*M_PI/10/(4.0*M_PI*pow(0.01,3)/3.),
+  (4*M_PI/1e3/(4.0*M_PI*pow(0.01,3)/3.),
    10,
    1e-3,
    0.01),

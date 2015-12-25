@@ -38,8 +38,8 @@ private:
   Wind wind_source_;
   SeveralSources source_;
   const SimpleCFL tsf_;
-  const SimpleFluxCalculator fc_;
-  //  const CustomFluxCalculator fc_;
+  //  const SimpleFluxCalculator fc_;
+  const CustomFluxCalculator fc_;
   const SimpleExtensiveUpdater eu_;
   const SimpleCellUpdater cu_;
   //  const CustomCellUpdater cu_;

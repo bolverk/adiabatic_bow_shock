@@ -71,8 +71,10 @@ const Conserved CustomFluxCalculator::calcHydroFlux
     const size_t right_index =
       static_cast<size_t>(edge.neighbors.second);
     const ComputationalCell& right_cell = cells[right_index];
+    /*
     if(right_cell.stickers.find("obstacle")->second)
       return Conserved();
+    */
     const Vector2D p = Parallel(edge);
     const Primitive right = convert_to_primitive(right_cell,eos);
     //const Vector2D pos = tess.GetMeshPoint(edge.neighbors.second);
@@ -91,8 +93,10 @@ const Conserved CustomFluxCalculator::calcHydroFlux
     const size_t left_index = 
       static_cast<size_t>(edge.neighbors.first);
     const ComputationalCell& left_cell = cells[left_index];
+    /*
     if(left_cell.stickers.find("obstacle")->second)
       return Conserved();
+    */
     const Primitive left = convert_to_primitive(left_cell, eos);
     const Vector2D p = Parallel(edge);
     //	const Vector2D pos = tess.GetMeshPoint(edge.neighbors.first);
@@ -113,9 +117,11 @@ const Conserved CustomFluxCalculator::calcHydroFlux
     static_cast<size_t>(edge.neighbors.second);
   const ComputationalCell& left_cell = cells[left_index];
   const ComputationalCell& right_cell = cells[right_index];
+  /*
   if(safe_retrieve(left_cell.stickers,string("obstacle")) &&
      safe_retrieve(right_cell.stickers,string("obstacle")))
     return Conserved();
+  */
   const Vector2D p = Parallel(edge);
   const Vector2D n =
     tess.GetMeshPoint(edge.neighbors.second) -
@@ -127,6 +133,7 @@ const Conserved CustomFluxCalculator::calcHydroFlux
       tess.GetCellCM(edge.neighbors.first),
       tess.GetCellCM(edge.neighbors.second),
       calc_centroid(edge)),n);
+  /*
   if(left_cell.stickers.find("obstacle")->second){
     const Primitive right = convert_to_primitive(right_cell,eos);
     const Primitive left = reflect(right,p);
@@ -139,6 +146,7 @@ const Conserved CustomFluxCalculator::calcHydroFlux
     return rotate_solve_rotate_back
       (rs_,left,right,velocity,n,p);
   }
+  */
   const Primitive left =
     convert_to_primitive(left_cell,eos);
   const Primitive right = 

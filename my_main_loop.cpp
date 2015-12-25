@@ -11,7 +11,7 @@ using namespace simulation2d;
 
 void my_main_loop(hdsim& sim)
 {
-  const double tf = 10;
+  const double tf = 1;
   SafeTimeTermination term_cond(tf,1e6);
   MultipleDiagnostics diag
     (VectorInitialiser<DiagnosticFunction*>
