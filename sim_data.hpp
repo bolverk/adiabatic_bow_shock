@@ -16,6 +16,7 @@
 #include "source/newtonian/two_dimensional/stationary_box.hpp"
 #include "wind.hpp"
 #include "source/newtonian/two_dimensional/source_terms/SeveralSources.hpp"
+#include "source/newtonian/two_dimensional/condition_action_sequence.hpp"
 
 class SimData
 {
@@ -40,7 +41,8 @@ private:
   SeveralSources source_;
   const SimpleCFL tsf_;
   //  const SimpleFluxCalculator fc_;
-  const CustomFluxCalculator fc_;
+  //  const CustomFluxCalculator fc_;
+  const ConditionActionSequence fc_;
   const SimpleExtensiveUpdater eu_;
   const SimpleCellUpdater cu_;
   //  const CustomCellUpdater cu_;

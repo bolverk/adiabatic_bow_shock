@@ -4,6 +4,8 @@
 #include "source/mpi/MeshPointsMPI.hpp"
 #include "source/tessellation/RoundGrid.hpp"
 
+typedef pair<const ConditionActionSequence::Condition*,const ConditionActionSequence::Action*> capp;
+
 namespace {
   vector<Vector2D> process_positions
   (const SquareBox& boundary)
@@ -54,7 +56,10 @@ SimData::SimData(void):
    (&wind_source_)
    ()),
   tsf_(0.3),
-  fc_(rs_),
+//  fc_(rs_),
+  fc_(VectorInitialiser<capp>
+      (capp(new IsBoundaryEdge, new FreeFlowFlux(rs_)))
+      (capp(new IsBulkEdge, new RegularFlux(rs_)))()),
   eu_(),
   cu_(),
   sim_

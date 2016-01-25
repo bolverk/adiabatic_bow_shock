@@ -7,6 +7,7 @@
 #include "temperature_appendix.hpp"
 #include "write_wall_time.hpp"
 #include <boost/lexical_cast.hpp>
+#include <boost/mpi.hpp>
 
 using namespace simulation2d;
 
@@ -14,7 +15,7 @@ void my_main_loop(hdsim& sim)
 {
   const boost::mpi::communicator world;
   const string rank_s = boost::lexical_cast<string>(world.rank());
-  const double tf = 10;
+  const double tf = 1;
   SafeTimeTermination term_cond(tf,1e6);
   MultipleDiagnostics diag
     (VectorInitialiser<DiagnosticFunction*>
