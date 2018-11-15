@@ -10,10 +10,10 @@ vector<ComputationalCell> calc_init_cond(const Tessellation& tess)
     res[i].density = 1;
     res[i].pressure = 1e-9;
     res[i].velocity = Vector2D(0,1);
-    res[i].stickers["obstacle"] = false;
+    res[i].stickers = vector<bool>(1, false);
     if(obstacle(r)){
       res[i].velocity = Vector2D(0,0);
-      res[i].stickers["obstacle"] = true;
+      res[i].stickers = vector<bool>(1, true);
     }
   }
   return res;

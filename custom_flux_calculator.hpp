@@ -17,7 +17,8 @@ public:
    const CacheData& cd,
    const EquationOfState& eos,
    const double /*time*/,
-   const double /*dt*/) const;
+   const double /*dt*/,
+   const TracerStickerNames& tsn) const;
 
 private:
   const RiemannSolver& rs_;
@@ -27,6 +28,7 @@ private:
    const vector<Vector2D>& point_velocities,
    const vector<ComputationalCell>& cells,
    const EquationOfState& eos,
+   const TracerStickerNames& tsn,
    const size_t i) const;
 };
 

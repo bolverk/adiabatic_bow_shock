@@ -13,6 +13,7 @@
 #include "custom_cell_updater.hpp"
 #include "source/misc/mesh_generator.hpp"
 #include "calc_init_cond.hpp"
+#include "source/newtonian/two_dimensional/stationary_box.hpp"
 
 class SimData
 {
@@ -29,6 +30,7 @@ private:
   VoronoiMesh tess_;
   const IdealGas eos_;
   Eulerian point_motion_;
+  const StationaryBox evc_;
   const Hllc rs_;
   CylindricalComplementary force_;
   const SimpleCFL tsf_;

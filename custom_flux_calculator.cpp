@@ -1,7 +1,9 @@
 #include "custom_flux_calculator.hpp"
+#include "source/newtonian/two_dimensional/simple_flux_calculator.hpp"
 #include "source/newtonian/common/hydrodynamics.hpp"
 
 namespace {
+  /*
     double calc_tracer_flux(const Edge& edge,
 			  const Tessellation& tess,
 			  const vector<ComputationalCell>& cells,
@@ -12,14 +14,15 @@ namespace {
        edge.neighbors.first>0 &&
        edge.neighbors.first<tess.GetPointNo())
       return hf.Mass*
-	cells[static_cast<size_t>(edge.neighbors.first)].tracers.find(name)->second;
+	cells[static_cast<size_t>(edge.neighbors.first)].tracers.front();
     if(hf.Mass<0 &&
        edge.neighbors.second>0 &&
        edge.neighbors.second<tess.GetPointNo())
       return hf.Mass*
-	cells[static_cast<size_t>(edge.neighbors.second)].tracers.find(name)->second;
+	cells[static_cast<size_t>(edge.neighbors.second)].tracers.front();
     return 0;	      
   }
+  */
 }
 
 CustomFluxCalculator::CustomFluxCalculator
@@ -34,22 +37,25 @@ vector<Extensive> CustomFluxCalculator::operator()
    const CacheData& /*cd*/,
    const EquationOfState& eos,
    const double /*time*/,
-   const double /*dt*/) const
+   const double /*dt*/,
+   const TracerStickerNames& tsn) const
 {
   vector<Extensive> res(tess.getAllEdges().size());
   for(size_t i=0;i<tess.getAllEdges().size();++i){
     const Conserved hydro_flux = 
       calcHydroFlux(tess, point_velocities,
-		    cells, eos, i);
+		    cells, eos, tsn, i);
     res[i].mass = hydro_flux.Mass;
     res[i].momentum = hydro_flux.Momentum;
     res[i].energy = hydro_flux.Energy;
+      /*
     for(std::map<std::string,double>::const_iterator it =
 	  cells.front().tracers.begin();
 	it!=cells.front().tracers.end();++it)
       res[i].tracers[it->first] = 
 	calc_tracer_flux(tess.getAllEdges()[i],
 			 tess,cells,it->first,hydro_flux);
+      */
   }
   return res;
 }
@@ -59,6 +65,7 @@ const Conserved CustomFluxCalculator::calcHydroFlux
  const vector<Vector2D>& point_velocities,
  const vector<ComputationalCell>& cells,
  const EquationOfState& eos,
+ const TracerStickerNames& tsn,
  const size_t i) const
 {
   const Edge& edge = tess.GetEdge(static_cast<int>(i));
@@ -70,10 +77,10 @@ const Conserved CustomFluxCalculator::calcHydroFlux
     const size_t right_index =
       static_cast<size_t>(edge.neighbors.second);
     const ComputationalCell& right_cell = cells[right_index];
-    if(right_cell.stickers.find("obstacle")->second)
+    if(right_cell.stickers.front())
       return Conserved();
     const Vector2D p = Parallel(edge);
-    const Primitive right = convert_to_primitive(right_cell,eos);
+    const Primitive right = convert_to_primitive(right_cell,eos,tsn);
     //const Vector2D pos = tess.GetMeshPoint(edge.neighbors.second);
     const Primitive left = 
       CalcPrimitive(1,
@@ -90,9 +97,9 @@ const Conserved CustomFluxCalculator::calcHydroFlux
     const size_t left_index = 
       static_cast<size_t>(edge.neighbors.first);
     const ComputationalCell& left_cell = cells[left_index];
-    if(left_cell.stickers.find("obstacle")->second)
+    if(left_cell.stickers.front())
       return Conserved();
-    const Primitive left = convert_to_primitive(left_cell, eos);
+    const Primitive left = convert_to_primitive(left_cell, eos, tsn);
     const Vector2D p = Parallel(edge);
     //	const Vector2D pos = tess.GetMeshPoint(edge.neighbors.first);
     const Primitive right = 
@@ -112,8 +119,8 @@ const Conserved CustomFluxCalculator::calcHydroFlux
     static_cast<size_t>(edge.neighbors.second);
   const ComputationalCell& left_cell = cells[left_index];
   const ComputationalCell& right_cell = cells[right_index];
-  if(left_cell.stickers.find("obstacle")->second &&
-     right_cell.stickers.find("obstacle")->second)
+  if(left_cell.stickers.front() &&
+     right_cell.stickers.front())
     return Conserved();
   const Vector2D p = Parallel(edge);
   const Vector2D n =
@@ -126,22 +133,22 @@ const Conserved CustomFluxCalculator::calcHydroFlux
       tess.GetCellCM(edge.neighbors.first),
       tess.GetCellCM(edge.neighbors.second),
       calc_centroid(edge)),n);
-  if(left_cell.stickers.find("obstacle")->second){
-    const Primitive right = convert_to_primitive(right_cell,eos);
+  if(left_cell.stickers.front()){
+    const Primitive right = convert_to_primitive(right_cell,eos, tsn);
     const Primitive left = reflect(right,p);
     return rotate_solve_rotate_back
       (rs_,left,right,velocity,n,p);
   }
-  if(right_cell.stickers.find("obstacle")->second){
-    const Primitive left = convert_to_primitive(left_cell,eos);
+  if(right_cell.stickers.front()){
+    const Primitive left = convert_to_primitive(left_cell,eos,tsn);
     const Primitive right = reflect(left,p);
     return rotate_solve_rotate_back
       (rs_,left,right,velocity,n,p);
   }
   const Primitive left =
-    convert_to_primitive(left_cell,eos);
+    convert_to_primitive(left_cell,eos,tsn);
   const Primitive right = 
-    convert_to_primitive(right_cell,eos);
+    convert_to_primitive(right_cell,eos,tsn);
   return rotate_solve_rotate_back
     (rs_,left,right,velocity,n,p);
 }

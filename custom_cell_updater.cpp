@@ -6,13 +6,14 @@ vector<ComputationalCell> CustomCellUpdater::operator()
 (const Tessellation& /*tess*/,
  const PhysicalGeometry& /*pg*/,
  const EquationOfState& eos,
- const vector<Extensive>& extensives,
+ vector<Extensive>& extensives,
  const vector<ComputationalCell>& old,
- const CacheData& cd) const
+ const CacheData& cd,
+ const TracerStickerNames& /*tsn*/) const
 {
   vector<ComputationalCell> res = old;
   for(size_t i=0;i<extensives.size();++i){
-    if(old[i].stickers.find("obstacle")->second)
+    if(old[i].stickers.front())
       continue;
     const double volume = cd.volumes[i];
     res[i].density = extensives[i].mass/volume;
@@ -22,10 +23,12 @@ vector<ComputationalCell> CustomCellUpdater::operator()
       0.5*ScalarProd(res[i].velocity, res[i].velocity);
     const double energy = total_energy - kinetic_energy;
     res[i].pressure = eos.de2p(res[i].density, energy);
+    /*
     for(std::map<std::string,double>::const_iterator it =
 	  extensives[i].tracers.begin();
 	it!=extensives[i].tracers.end();++it)
       res[i].tracers[it->first] = it->second/extensives[i].mass;
+    */
   }
   return res;
 }
